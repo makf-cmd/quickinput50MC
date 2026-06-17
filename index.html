@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>速成輸入法專業測驗</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --success: #16a34a;
+            --error: #dc2626;
+            --border: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        /* SVG Chart Styles */
+        .chart-container {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 40px;
+            overflow-x: auto;
+        }
+        
+        .chart-title {
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: var(--text-main);
+        }
+
+        svg {
+            width: 100%;
+            height: auto;
+            max-height: 400px;
+        }
+
+        /* Quiz Styles */
+        .quiz-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .question-block {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .question-block:last-child {
+            border-bottom: none;
+        }
+
+        .question-text {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+        }
+
+        .option-label {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background-color: var(--bg-color);
+        }
+
+        .option-label:hover {
+            border-color: var(--primary-color);
+            background-color: #eff6ff;
+        }
+
+        .option-label input[type="radio"] {
+            margin-right: 12px;
+            transform: scale(1.2);
+            cursor: pointer;
+        }
+
+        .submit-btn {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+            box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.3);
+        }
+
+        .submit-btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        /* Results Styles */
+        #results-container {
+            display: none;
+        }
+
+        .score-banner {
+            background: linear-gradient(135deg, #1e40af, #3b82f6);
+            color: white;
+            text-align: center;
+            padding: 40px 20px;
+            border-radius: 12px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .score-banner h2 {
+            font-size: 3rem;
+            margin: 0;
+        }
+
+        .score-banner p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-top: 10px;
+        }
+
+        .result-item {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 6px solid;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .result-item.correct {
+            border-color: var(--success);
+        }
+
+        .result-item.incorrect {
+            border-color: var(--error);
+        }
+
+        .result-q {
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+
+        .result-ans {
+            margin-bottom: 8px;
+        }
+
+        .result-exp {
+            background-color: #f1f5f9;
+            padding: 12px;
+            border-radius: 6px;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-top: 10px;
+        }
+
+        .correct-text { color: var(--success); font-weight: bold; }
+        .incorrect-text { color: var(--error); font-weight: bold; }
+
+        @media (max-width: 600px) {
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+            h1 { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>速成輸入法專業測驗</h1>
+        <p class="subtitle">打字專家的50道精選挑戰 ── 每次刷新選項與題目皆會隨機排序</p>
+    </header>
+
+    <!-- 科學圖表 SVG -->
+    <div class="chart-container">
+        <div class="chart-title">科學圖表：速成輸入法學習曲線 (Learning Curve Model)</div>
+        <svg viewBox="0 0 800 400" preserveAspectRatio="xMidYMid meet">
+            <!-- Definitions for gradients -->
+            <defs>
+                <linearGradient id="areaGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.4" />
+                    <stop offset="100%" stop-color="#3b82f6" stop-opacity="0.0" />
+                </linearGradient>
+            </defs>
+
+            <!-- Grid Lines -->
+            <g stroke="#e2e8f0" stroke-dasharray="4,4" stroke-width="1">
+                <line x1="80" y1="50" x2="750" y2="50" />
+                <line x1="80" y1="125" x2="750" y2="125" />
+                <line x1="80" y1="200" x2="750" y2="200" />
+                <line x1="80" y1="275" x2="750" y2="275" />
+                
+                <line x1="200" y1="50" x2="200" y2="350" />
+                <line x1="400" y1="50" x2="400" y2="350" />
+                <line x1="600" y1="50" x2="600" y2="350" />
+            </g>
+
+            <!-- Axes -->
+            <g stroke="#1e293b" stroke-width="2">
+                <!-- X Axis -->
+                <line x1="80" y1="350" x2="750" y2="350" />
+                <!-- Y Axis -->
+                <line x1="80" y1="50" x2="80" y2="350" />
+            </g>
+
+            <!-- Area under curve -->
+            <path d="M 80 350 Q 250 80 700 60 L 700 350 Z" fill="url(#areaGradient)" />
+            
+            <!-- The Learning Curve -->
+            <path d="M 80 350 Q 250 80 700 60" fill="none" stroke="#2563eb" stroke-width="4" stroke-linecap="round" />
+
+            <!-- Data Points -->
+            <circle cx="80" cy="350" r="5" fill="#1e40af" />
+            <circle cx="200" cy="180" r="5" fill="#1e40af" />
+            <circle cx="400" cy="85" r="5" fill="#1e40af" />
+            <circle cx="700" cy="60" r="5" fill="#1e40af" />
+
+            <!-- Axes Labels -->
+            <g fill="#64748b" font-size="12" font-family="sans-serif">
+                <!-- Y-axis values -->
+                <text x="70" y="55" text-anchor="end">100 WPM</text>
+                <text x="70" y="130" text-anchor="end">75 WPM</text>
+                <text x="70" y="205" text-anchor="end">50 WPM</text>
+                <text x="70" y="280" text-anchor="end">25 WPM</text>
+                <text x="70" y="355" text-anchor="end">0</text>
+
+                <!-- X-axis values -->
+                <text x="200" y="370" text-anchor="middle">10 小時</text>
+                <text x="400" y="370" text-anchor="middle">50 小時</text>
+                <text x="600" y="370" text-anchor="middle">100 小時</text>
+
+                <!-- Axis Titles -->
+                <text x="415" y="395" text-anchor="middle" font-weight="bold" fill="#1e293b" font-size="14">練習時間 (Practice Time)</text>
+                <text x="25" y="200" text-anchor="middle" transform="rotate(-90 25 200)" font-weight="bold" fill="#1e293b" font-size="14">打字速度 (Typing Speed)</text>
+            </g>
+        </svg>
+    </div>
+
+    <!-- 測驗區域 -->
+    <form id="quizForm">
+        <div class="quiz-card" id="quiz-container">
+            <!-- Questions will be injected here by JS -->
+        </div>
+        <button type="submit" class="submit-btn">提交測驗並查看結果</button>
+    </form>
+
+    <!-- 結果區域 -->
+    <div id="results-container">
+        <div class="score-banner">
+            <h2>你的得分：<span id="score-display">0</span> / 50</h2>
+            <p id="score-message">正在計算您的打字專業評級...</p>
+        </div>
+        <div id="detailed-results">
+            <!-- Detailed results will be injected here -->
+        </div>
+    </div>
+</div>
+
+<script>
+    // 題庫設計：涵蓋基本字根、常用字拆碼、規則與特殊鍵
+    const database = [
+        { q: "鍵盤上的「A」鍵代表哪一個速成基本字根？", opts: ["日", "月", "金", "木"], ans: "日", exp: "A鍵對應的字根是「日」。" },
+        { q: "鍵盤上的「B」鍵代表哪一個速成基本字根？", opts: ["日", "月", "水", "火"], ans: "月", exp: "B鍵對應的字根是「月」。" },
+        { q: "鍵盤上的「C」鍵代表哪一個速成基本字根？", opts: ["金", "木", "水", "土"], ans: "金", exp: "C鍵對應的字根是「金」。" },
+        { q: "鍵盤上的「D」鍵代表哪一個速成基本字根？", opts: ["金", "木", "水", "火"], ans: "木", exp: "D鍵對應的字根是「木」。" },
+        { q: "鍵盤上的「E」鍵代表哪一個速成基本字根？", opts: ["竹", "戈", "十", "水"], ans: "水", exp: "E鍵對應的字根是「水」。" },
+        { q: "鍵盤上的「F」鍵代表哪一個速成基本字根？", opts: ["火", "土", "大", "中"], ans: "火", exp: "F鍵對應的字根是「火」。" },
+        { q: "鍵盤上的「G」鍵代表哪一個速成基本字根？", opts: ["火", "土", "木", "金"], ans: "土", exp: "G鍵對應的字根是「土」。" },
+        { q: "鍵盤上的「H」鍵代表哪一個速成基本字根？", opts: ["竹", "戈", "十", "大"], ans: "竹", exp: "H鍵對應的字根是「竹」。" },
+        { q: "鍵盤上的「I」鍵代表哪一個速成基本字根？", opts: ["竹", "戈", "十", "中"], ans: "戈", exp: "I鍵對應的字根是「戈」。" },
+        { q: "鍵盤上的「J」鍵代表哪一個速成基本字根？", opts: ["竹", "戈", "十", "大"], ans: "十", exp: "J鍵對應的字根是「十」。" },
+        { q: "鍵盤上的「K」鍵代表哪一個速成基本字根？", opts: ["大", "中", "一", "弓"], ans: "大", exp: "K鍵對應的字根是「大」。" },
+        { q: "鍵盤上的「L」鍵代表哪一個速成基本字根？", opts: ["大", "中", "一", "弓"], ans: "中", exp: "L鍵對應的字根是「中」。" },
+        { q: "鍵盤上的「M」鍵代表哪一個速成基本字根？", opts: ["中", "一", "弓", "人"], ans: "一", exp: "M鍵對應的字根是「一」。" },
+        { q: "鍵盤上的「N」鍵代表哪一個速成基本字根？", opts: ["一", "弓", "人", "心"], ans: "弓", exp: "N鍵對應的字根是「弓」。" },
+        { q: "鍵盤上的「O」鍵代表哪一個速成基本字根？", opts: ["弓", "人", "心", "手"], ans: "人", exp: "O鍵對應的字根是「人」。" },
+        { q: "鍵盤上的「P」鍵代表哪一個速成基本字根？", opts: ["人", "心", "手", "口"], ans: "心", exp: "P鍵對應的字根是「心」。" },
+        { q: "鍵盤上的「Q」鍵代表哪一個速成基本字根？", opts: ["心", "手", "口", "尸"], ans: "手", exp: "Q鍵對應的字根是「手」。" },
+        { q: "鍵盤上的「R」鍵代表哪一個速成基本字根？", opts: ["手", "口", "尸", "廿"], ans: "口", exp: "R鍵對應的字根是「口」。" },
+        { q: "鍵盤上的「S」鍵代表哪一個速成基本字根？", opts: ["口", "尸", "廿", "山"], ans: "尸", exp: "S鍵對應的字根是「尸」。" },
+        { q: "鍵盤上的「T」鍵代表哪一個速成基本字根？", opts: ["尸", "廿", "山", "女"], ans: "廿", exp: "T鍵對應的字根是「廿」。" },
+        { q: "鍵盤上的「U」鍵代表哪一個速成基本字根？", opts: ["廿", "山", "女", "田"], ans: "山", exp: "U鍵對應的字根是「山」。" },
+        { q: "鍵盤上的「V」鍵代表哪一個速成基本字根？", opts: ["山", "女", "田", "卜"], ans: "女", exp: "V鍵對應的字根是「女」。" },
+        { q: "鍵盤上的「W」鍵代表哪一個速成基本字根？", opts: ["女", "田", "卜", "難"], ans: "田", exp: "W鍵對應的字根是「田」。" },
+        { q: "鍵盤上的「Y」鍵代表哪一個速成基本字根？", opts: ["田", "卜", "難", "金"], ans: "卜", exp: "Y鍵對應的字根是「卜」。" },
+        { q: "速成輸入法的基本取碼原則是什麼？", opts: ["取第一和第二碼", "取第一和最後一碼", "取最後兩碼", "隨機取兩碼"], ans: "取第一和最後一碼", exp: "速成輸入法是倉頡的簡化版，只取倉頡碼的首、尾兩碼。" },
+        { q: "「明」字的速成碼是什麼？", opts: ["日月 (AB)", "日木 (AD)", "月日 (BA)", "月木 (BD)"], ans: "日月 (AB)", exp: "「明」字由「日」和「月」組成，首碼為日，尾碼為月。" },
+        { q: "「的」字的速成碼是什麼？", opts: ["竹日 (HA)", "竹戈 (HI)", "白戈 (HI)", "白點 (HI)"], ans: "竹戈 (HI)", exp: "「的」字的倉頡碼是「竹日戈 (HAI)」，速成取首尾碼「竹戈 (HI)」。" },
+        { q: "「我」字的速成碼是什麼？", opts: ["竹戈 (HI)", "手戈 (QI)", "竹十 (HJ)", "竹手 (HQ)"], ans: "竹戈 (HI)", exp: "「我」字的倉頡碼是「竹手戈 (HQI)」，速成取首尾碼「竹戈 (HI)」。" },
+        { q: "「是」字的速成碼是什麼？", opts: ["日人 (AO)", "日一 (AM)", "日卜 (AY)", "日走 (AO)"], ans: "日人 (AO)", exp: "「是」字的倉頡碼是「日一卜人 (AMYO)」，速成取首尾碼「日人 (AO)」。" },
+        { q: "「不」字的速成碼是什麼？", opts: ["一火 (MF)", "一木 (MD)", "一大 (MK)", "一卜 (MY)"], ans: "一火 (MF)", exp: "「不」字的倉頡碼是「一火 (MF)」，速成全取。" },
+        { q: "「有」字的速成碼是什麼？", opts: ["大月 (KB)", "十月 (JB)", "一大 (MK)", "大日 (KA)"], ans: "大月 (KB)", exp: "「有」字的倉頡碼是「大月 (KB)」，速成全取。" },
+        { q: "「會」字的速成碼是什麼？", opts: ["人日 (OA)", "人田 (OW)", "人月 (OB)", "人一 (OM)"], ans: "人日 (OA)", exp: "「會」字的倉頡碼是「人一田日 (OMWA)」，速成取首尾碼「人日 (OA)」。" },
+        { q: "「為」字的速成碼是什麼？", opts: ["戈火 (IF)", "戈水 (IE)", "戈木 (ID)", "戈土 (IG)"], ans: "戈火 (IF)", exp: "「為」字的倉頡碼是「戈竹弓火 (IHNF)」，速成取首尾碼「戈火 (IF)」。" },
+        { q: "「國」字的速成碼是什麼？", opts: ["田一 (WM)", "田口 (WR)", "田戈 (WI)", "田心 (WP)"], ans: "田一 (WM)", exp: "「國」字的倉頡碼是「田戈口一 (WIRM)」，速成取首尾碼「田一 (WM)」。" },
+        { q: "如果一個字只有一個倉頡碼（例如「日」），在速成中應該怎麼打？", opts: ["直接按該鍵再按空白鍵", "按該鍵兩次", "按該鍵加Z", "無法輸入"], ans: "直接按該鍵再按空白鍵", exp: "對於只有一碼的字（如日、月、金等），直接按該鍵並按空白鍵即可。" },
+        { q: "「學」字的速成碼是什麼？", opts: ["竹木 (HD)", "竹子 (HN)", "月木 (BD)", "月子 (BN)"], ans: "竹木 (HD)", exp: "「學」字的倉頡碼是「竹月弓木 (HBND)」，速成取首尾碼「竹木 (HD)」。" },
+        { q: "「校」字的速成碼是什麼？", opts: ["木大 (DK)", "木卜 (DY)", "木十 (DJ)", "木交 (DK)"], ans: "木大 (DK)", exp: "「校」字的倉頡碼是「木卜大 (DYK)」，速成取首尾碼「木大 (DK)」。" },
+        { q: "「電」字的速成碼是什麼？", opts: ["一山 (MU)", "一田 (MW)", "雨田 (MW)", "雨山 (MU)"], ans: "一山 (MU)", exp: "「電」字的倉頡碼是「一月田山 (MBWU)」，速成取首尾碼「一山 (MU)」。" },
+        { q: "「腦」字的速成碼是什麼？", opts: ["月山 (BU)", "月田 (BW)", "月女 (BV)", "月大 (BK)"], ans: "月田 (BW)", exp: "「腦」字的倉頡碼是「月女女田 (BVVW)」，速成取首尾碼「月田 (BW)」。" },
+        { q: "「字」字的速成碼是什麼？", opts: ["十木 (JD)", "十子 (JN)", "宀木 (JD)", "宀子 (JN)"], ans: "十木 (JD)", exp: "「字」字的倉頡碼是「十弓木 (JND)」，速成取首尾碼「十木 (JD)」。" },
+        { q: "「香」字的速成碼是什麼？", opts: ["竹日 (HA)", "木日 (DA)", "禾日 (HA)", "禾口 (HR)"], ans: "竹日 (HA)", exp: "「香」字的倉頡碼是「竹木日 (HDA)」，速成取首尾碼「竹日 (HA)」。" },
+        { q: "「港」字的速成碼是什麼？", opts: ["水山 (EU)", "水廿 (ET)", "水己 (ES)", "水口 (ER)"], ans: "水山 (EU)", exp: "「港」字的倉頡碼是「水廿金山 (ETCU)」，速成取首尾碼「水山 (EU)」。" },
+        { q: "「休」字的速成碼是什麼？", opts: ["人木 (OD)", "人十 (OJ)", "人一 (OM)", "人大 (OK)"], ans: "人木 (OD)", exp: "「休」字的倉頡碼是「人木 (OD)」，速成全取。" },
+        { q: "「話」字的速成碼是什麼？", opts: ["卜口 (YR)", "卜舌 (YR)", "言口 (YR)", "言舌 (YR)"], ans: "卜口 (YR)", exp: "「話」字的倉頡碼是「卜口竹口 (YRHR)」，速成取首尾碼「卜口 (YR)」。" },
+        { q: "「難」字的速成碼是什麼？", opts: ["廿土 (TG)", "廿人 (TO)", "廿木 (TD)", "廿中 (TL)"], ans: "廿土 (TG)", exp: "「難」字的倉頡碼是「廿難人土 (TXOG)」，速成取首尾碼「廿土 (TG)」。" },
+        { q: "「打」字的速成碼是什麼？", opts: ["手弓 (QN)", "手一 (QM)", "手丁 (QN)", "手十 (QJ)"], ans: "手弓 (QN)", exp: "「打」字的倉頡碼是「手一弓 (QMN)」，速成取首尾碼「手弓 (QN)」。" },
+        { q: "在速成輸入法中，遇到全形標點符號，通常可以用哪個鍵作為開頭來尋找？", opts: ["Z鍵", "X鍵", "Q鍵", "空白鍵"], ans: "Z鍵", exp: "在多數速成/倉頡系統中，Z鍵被用來呼叫全形標點符號或特殊字元。" },
+        { q: "速成碼「MF」通常可以用來打出哪一個常見中文字？", opts: ["不", "下", "正", "平"], ans: "不", exp: "「不」的拆碼是「一火」，對應英文字母 MF。" },
+        { q: "速成碼「HI」通常可以用來打出哪兩個常見中文字？", opts: ["我、的", "你、他", "是、非", "上、下"], ans: "我、的", exp: "「我」的倉頡碼是 HQI，「的」是 HAI，兩者的速成碼（首尾碼）皆為 HI。" },
+        { q: "「理」字的速成碼是什麼？", opts: ["一土 (MG)", "一田 (MW)", "王土 (MG)", "王田 (MW)"], ans: "一土 (MG)", exp: "「理」字的倉頡碼是「一土田土 (MGWG)」，速成取首尾碼「一土 (MG)」。" }
+    ];
+
+    // 隨機打亂陣列順序的函數 (Fisher-Yates Shuffle)
+    function shuffleArray(array) {
+        const arr = [...array];
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+
+    // 初始化測驗
+    function initQuiz() {
+        const quizContainer = document.getElementById('quiz-container');
+        // 隨機打亂所有題目
+        const shuffledQuestions = shuffleArray(database);
+        
+        let htmlContent = '';
+
+        shuffledQuestions.forEach((qObj, index) => {
+            // 隨機打亂選項
+            const shuffledOpts = shuffleArray(qObj.opts);
+            
+            htmlContent += `
+                <div class="question-block" id="q-block-${index}">
+                    <div class="question-text">${index + 1}. ${qObj.q}</div>
+                    <div class="options-grid">
+            `;
+
+            shuffledOpts.forEach((opt, optIndex) => {
+                // 將原始答案資訊存在 data 屬性中，以便後續核對
+                const isCorrect = (opt === qObj.ans) ? 'true' : 'false';
+                htmlContent += `
+                    <label class="option-label">
+                        <input type="radio" name="q${index}" value="${opt}" data-correct="${isCorrect}" data-qindex="${index}">
+                        ${opt}
+                    </label>
+                `;
+            });
+
+            htmlContent += `
+                    </div>
+                    <!-- 隱藏的解答與說明，提交後顯示 -->
+                    <div class="result-exp" id="exp-${index}" style="display: none;">
+                        <div id="status-${index}"></div>
+                        <div><strong>正確答案：</strong>${qObj.ans}</div>
+                        <div><strong>說明：</strong>${qObj.exp}</div>
+                    </div>
+                </div>
+            `;
+        });
+
+        quizContainer.innerHTML = htmlContent;
+    }
+
+    // 處理測驗提交
+    document.getElementById('quizForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        // 取得所有題目區塊
+        const totalQuestions = database.length;
+        let score = 0;
+
+        for (let i = 0; i < totalQuestions; i++) {
+            const selectedOption = document.querySelector(`input[name="q${i}"]:checked`);
+            const expDiv = document.getElementById(`exp-${i}`);
+            const statusDiv = document.getElementById(`status-${i}`);
+            
+            expDiv.style.display = 'block'; // 顯示解說
+
+            if (selectedOption) {
+                const isCorrect = selectedOption.getAttribute('data-correct') === 'true';
+                if (isCorrect) {
+                    score++;
+                    statusDiv.innerHTML = '<span class="correct-text">✔️ 答對了！</span>';
+                    selectedOption.parentElement.style.borderColor = 'var(--success)';
+                    selectedOption.parentElement.style.backgroundColor = '#f0fdf4';
+                } else {
+                    statusDiv.innerHTML = '<span class="incorrect-text">❌ 答錯了。</span> 您的選擇：' + selectedOption.value;
+                    selectedOption.parentElement.style.borderColor = 'var(--error)';
+                    selectedOption.parentElement.style.backgroundColor = '#fef2f2';
+                }
+            } else {
+                statusDiv.innerHTML = '<span class="incorrect-text">⚠️ 未作答。</span>';
+            }
+
+            // 停用所有 radio button
+            const allRadios = document.querySelectorAll(`input[name="q${i}"]`);
+            allRadios.forEach(radio => radio.disabled = true);
+        }
+
+        // 隱藏提交按鈕
+        document.querySelector('.submit-btn').style.display = 'none';
+
+        // 顯示結果區域
+        const resultsContainer = document.getElementById('results-container');
+        resultsContainer.style.display = 'block';
+        
+        // 更新分數與評級
+        document.getElementById('score-display').textContent = score;
+        const msgElement = document.getElementById('score-message');
+        
+        if (score === 50) {
+            msgElement.textContent = "🏆 完美！你絕對是速成輸入法大師！";
+        } else if (score >= 40) {
+            msgElement.textContent = "🌟 非常優秀！你的打字基礎非常扎實。";
+        } else if (score >= 30) {
+            msgElement.textContent = "👍 不錯！具備一定的速成輸入法知識。";
+        } else {
+            msgElement.textContent = "📚 還需要多加練習，請參考下方的詳細解說來提升自己喔！";
+        }
+
+        // 平滑滾動至結果頂部
+        resultsContainer.scrollIntoView({ behavior: 'smooth' });
+    });
+
+    // 網頁載入時初始化測驗
+    window.onload = initQuiz;
+
+</script>
+</body>
+</html>
